@@ -1,5 +1,14 @@
 package main
 
+import (
+	"encoding/json"
+	"fmt"
+	"log"
+	"os"
+
+	"github.com/joho/godotenv"
+)
+
 type GithubUser struct {
 	Name      string `json:"name,omitempty"`
 	Email     string `json:"email,omitempty"`
@@ -25,6 +34,36 @@ type GithubUser struct {
 	UserViewType string `json:"user_view_type"`
 }
 
-func main() {
-
+type Config struct {
+	FollowersThresholdToBlock int64 `json:"FOLLOWERS_THRESHOLD_TO_BLOCK"`
+	UserName string `json:"USER_NAME"`
 }
+
+const UserFollowersURI = "https://api.github.com/users/%s/followers";
+const ConfigFilePath = "./config.json";
+const EnvFilePath = "./.env";
+
+func main() {
+	err := godotenv.Load(EnvFilePath);
+	if err != nil {
+		log.Fatal(err.Error());
+		os.Exit(0);
+	}
+	buffer, err := os.ReadFile(ConfigFilePath)
+	if err != nil {
+		log.Fatal(err.Error());
+		os.Exit(0);
+	}
+	var config Config;
+	if err := json.Unmarshal(buffer, &config); err != nil {
+		log.Fatal(err.Error());
+		os.Exit(0);
+	}
+	fmt.Print("%v", config);
+}
+
+
+
+
+
+
