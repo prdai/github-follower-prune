@@ -1,0 +1,6 @@
+- figure out how to handle errors properly
+- create a github client struct and a applySharedHeaders func
+- proper logging method
+- fix the init makefile func
+- make the pre commit hook
+- structure the project in a good way

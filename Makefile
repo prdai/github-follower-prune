@@ -9,10 +9,11 @@ init:
 	echo "update the config.json to your liking and your user name"
 
 lint:
-	golangci-lint run ./test/
+	golangci-lint run 
 
 format:
-	golangci-lint fmt ./test/
+	goimports -w .
+	golangci-lint fmt
 
 run:
 	go run main.go

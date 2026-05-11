@@ -9,8 +9,6 @@ my bad for being dramatic, but fr this is a really basic script in case you ever
 ## permissions
 
 - you can either utilize the github cli and login using `gh auth login` and do this
-- or else you can create a fine tuned permissions github pat token with:
-    - x 
-    - y
-
-
+- or else you can create a fine tuned permissions github pat token with (both read and write permissions):
+    - Block another user 
+    - Followers 
