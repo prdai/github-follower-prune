@@ -28,6 +28,6 @@ func main() {
 		log.Fatal(err.Error())
 		os.Exit(0)
 	}
-	blockedUsersCh := make(chan string)
-	FindMassFollowers(blockedUsersCh, &config)
+	// blockedUsersCh := make(chan string)
+	// FindMassFollowers(blockedUsersCh, &config)
 }

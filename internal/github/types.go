@@ -1,5 +1,7 @@
 package github
 
+import "sync"
+
 
 type GithubUser struct {
 	Name              string `json:"name,omitempty"`
@@ -24,6 +26,17 @@ type GithubUser struct {
 	SiteAdmin         bool   `json:"site_admin"`
 	StarredAt         string `json:"starred_at"`
 	UserViewType      string `json:"user_view_type"`
+}
+
+type GithubUsers struct {
+	Users []GithubUser
+	mu sync.Mutex
+}
+
+func (g *GithubUsers) Append(githubUsers GithubUsers) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	g.Users = append(g.Users, githubUsers.Users...)
 }
 
 type GithubUserListURI string;
