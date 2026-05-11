@@ -18,20 +18,20 @@ var SharedGhClientHeaders = map[string]string{
 }
 
 type githubClient struct {
-	client *http.Client
+	client        *http.Client
 	sharedHeaders map[string]string
-	userName string
+	userName      string
 }
 
 func InitGithubClient(config *types.Config) *githubClient {
 	return &githubClient{
-		client: &http.Client{},
+		client:        &http.Client{},
 		sharedHeaders: SharedGhClientHeaders,
-		userName: config.UserName,
+		userName:      config.UserName,
 	}
 }
 
-func (g *githubClient) applySharedHeaders(request *http.Request){
+func (g *githubClient) applySharedHeaders(request *http.Request) {
 	for headerName, headerValue := range g.sharedHeaders {
 		request.Header.Set(headerName, headerValue)
 	}
@@ -50,4 +50,3 @@ func (g *githubClient) extractResponseBodyContent(response *http.Response, respo
 		os.Exit(0)
 	}
 }
-

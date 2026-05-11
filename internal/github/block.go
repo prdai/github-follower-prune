@@ -1,5 +1,12 @@
 package github
 
+import (
+	"fmt"
+	"log"
+	"net/http"
+	"os"
+)
+
 const BlockUserURI string = "https://api.github.com/user/blocks/%s"
 
 func (g *githubClient) BlockGithubUser(blockingUserName string) bool {
@@ -8,7 +15,7 @@ func (g *githubClient) BlockGithubUser(blockingUserName string) bool {
 		log.Fatal(err.Error())
 		os.Exit(0)
 	}
-	g.applySharedHeaders(req);
+	g.applySharedHeaders(req)
 	res, err := g.client.Do(req)
 	if err != nil {
 		log.Fatal(err.Error())
@@ -19,4 +26,3 @@ func (g *githubClient) BlockGithubUser(blockingUserName string) bool {
 	}
 	return true
 }
-

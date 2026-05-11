@@ -1,6 +1,13 @@
 package github
 
-func FindMassFollowers(blockedUsersCh <-chan string, config *Config) {
+import (
+	"log"
+	"sync"
+
+	"github.com/prdai/github-follower-prune/internal/types"
+)
+
+func FindMassFollowers(blockedUsersCh <-chan string, config *types.Config) {
 	userFollowers := GetGitHubUsersPage(config.UserName, UserFollowersURI)
 	var wg sync.WaitGroup
 	for _, userFollower := range *userFollowers {

@@ -16,4 +16,4 @@ format:
 	golangci-lint fmt
 
 run:
-	go run main.go
+	go run ./cmd/blocker/main.go 

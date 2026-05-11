@@ -9,8 +9,8 @@ import (
 	"github.com/prdai/github-follower-prune/internal/types"
 )
 
-const ConfigFilePath string = "./config.json"
-const EnvFilePath string = "./.env"
+const ConfigFilePath string = "config.json"
+const EnvFilePath string = ".env"
 
 func main() {
 	err := godotenv.Load(EnvFilePath)
