@@ -2,10 +2,12 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 
 	"github.com/joho/godotenv"
+	"github.com/prdai/github-follower-prune/internal/github"
 	"github.com/prdai/github-follower-prune/internal/types"
 )
 
@@ -29,5 +31,9 @@ func main() {
 		os.Exit(0)
 	}
 	// blockedUsersCh := make(chan string)
+
 	// FindMassFollowers(blockedUsersCh, &config)
+	ghClient := github.InitGithubClient(&config)
+	ghUser := ghClient.GetGitHubUser("prdai", github.UserProfileURI)
+	fmt.Printf("%+v", ghUser)
 }

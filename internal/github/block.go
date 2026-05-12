@@ -7,10 +7,11 @@ import (
 	"os"
 )
 
-const BlockUserURI string = "https://api.github.com/user/blocks/%s"
+var BlockUserURI GithubBlockURI = GithubBlockURI{URI: "https://api.github.com/user/blocks/%s", Method: "PUT"}
+var UnBlockUserURI GithubBlockURI = GithubBlockURI{URI: "https://api.github.com/user/blocks/%s", Method: "DELETE"}
 
-func (g *githubClient) BlockGithubUser(blockingUserName string) bool {
-	req, err := http.NewRequest("PUT", fmt.Sprintf(BlockUserURI, blockingUserName), nil)
+func (g *githubClient) BlockGithubUser(blockingUserName string, uri GithubBlockURI) bool {
+	req, err := http.NewRequest(uri.Method, fmt.Sprintf(string(uri.URI), blockingUserName), nil)
 	if err != nil {
 		log.Fatal(err.Error())
 		os.Exit(0)

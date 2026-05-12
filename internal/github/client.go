@@ -37,7 +37,7 @@ func (g *githubClient) applySharedHeaders(request *http.Request) {
 	}
 }
 
-func (g *githubClient) extractResponseBodyContent(response *http.Response, responseStructure interface{}) {
+func (g *githubClient) extractResponseBodyContent(response *http.Response, responseStructure any) {
 	defer response.Body.Close()
 	body, err := io.ReadAll(response.Body)
 	if err != nil {

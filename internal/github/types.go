@@ -2,8 +2,13 @@ package github
 
 import "sync"
 
-
 type GithubUser struct {
+	Login     string `json:"login"`
+	Followers int    `json:"followers"`
+	Following int    `json:"following"`
+}
+
+type GithubDetailedUser struct {
 	Name              string `json:"name,omitempty"`
 	Email             string `json:"email,omitempty"`
 	Login             string `json:"login"`
@@ -28,15 +33,21 @@ type GithubUser struct {
 	UserViewType      string `json:"user_view_type"`
 }
 
-type GithubUsers struct {
-	Users []GithubUser
-	mu sync.Mutex
+type GithubDetailedUsers struct {
+	Users *[]GithubDetailedUser
+	mu    *sync.Mutex
 }
 
-func (g *GithubUsers) Append(githubUsers GithubUsers) {
+func (g *GithubDetailedUsers) Append(detailedGithubUsers ...GithubDetailedUser) *[]GithubDetailedUser {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	g.Users = append(g.Users, githubUsers.Users...)
+	*g.Users = append(*g.Users, detailedGithubUsers...)
+	return g.Users
 }
 
-type GithubUserListURI string;
+type GithubUserURI string
+
+type GithubBlockURI struct {
+	URI    string
+	Method string
+}
