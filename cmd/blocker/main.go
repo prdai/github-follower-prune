@@ -11,29 +11,54 @@ import (
 	"github.com/prdai/github-follower-prune/internal/types"
 )
 
-const ConfigFilePath string = "config.json"
-const EnvFilePath string = ".env"
+const (
+	configFilePath = "config.json"
+	envFilePath    = ".env"
+)
 
 func main() {
-	err := godotenv.Load(EnvFilePath)
-	if err != nil {
-		log.Fatal(err.Error())
-		os.Exit(0)
+	if err := run(); err != nil {
+		log.Fatal(err)
 	}
-	buffer, err := os.ReadFile(ConfigFilePath)
+}
+
+func run() error {
+	if err := godotenv.Load(envFilePath); err != nil {
+		return fmt.Errorf("loading %s: run `make init` first: %w", envFilePath, err)
+	}
+	config, err := loadConfig(configFilePath)
 	if err != nil {
-		log.Fatal(err.Error())
-		os.Exit(0)
+		return err
+	}
+	client, err := github.NewGithubClient(config)
+	if err != nil {
+		return err
+	}
+	result, err := client.PruneMassFollowers(config)
+	if err != nil {
+		return err
+	}
+	for _, login := range result.Blocked {
+		fmt.Printf("pruned %s\n", login)
+	}
+	for login, err := range result.Failed {
+		fmt.Fprintf(os.Stderr, "FAILED %s: %v\n", login, err)
+	}
+	fmt.Printf("done: %d pruned, %d failed\n", len(result.Blocked), len(result.Failed))
+	return nil
+}
+
+func loadConfig(path string) (*types.Config, error) {
+	buffer, err := os.ReadFile(path)
+	if err != nil {
+		return nil, fmt.Errorf("reading %s: %w", path, err)
 	}
 	var config types.Config
 	if err := json.Unmarshal(buffer, &config); err != nil {
-		log.Fatal(err.Error())
-		os.Exit(0)
+		return nil, fmt.Errorf("parsing %s: %w", path, err)
 	}
-	// blockedUsersCh := make(chan string)
-
-	// FindMassFollowers(blockedUsersCh, &config)
-	ghClient := github.InitGithubClient(&config)
-	ghUser := ghClient.GetGitHubUser("prdai", github.UserProfileURI)
-	fmt.Printf("%+v", ghUser)
+	if config.UserName == "" {
+		return nil, fmt.Errorf("%s: USER_NAME is required", path)
+	}
+	return &config, nil
 }

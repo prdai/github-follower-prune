@@ -2,52 +2,54 @@ package github
 
 import (
 	"fmt"
-	"log"
 	"net/http"
-	"os"
+	"strconv"
 )
 
-const UserProfileURI GithubUserURI = "https://api.github.com/users/%s"
-const UserFollowingURI GithubUserURI = "https://api.github.com/users/%s/following"
+const (
+	userProfileURI   GithubUserURI = "https://api.github.com/users/%s"
+	userFollowersURI GithubUserURI = "https://api.github.com/users/%s/followers"
+	followersPerPage               = 100
+)
 
-func (g *githubClient) GetGitHubUser(username string, uri GithubUserURI) GithubUser {
-	req, err := http.NewRequest("GET", fmt.Sprintf(string(uri), username), nil)
+func (g *githubClient) GetGitHubUser(username string) (GithubUser, error) {
+	var user GithubUser
+	request, err := g.newRequest(http.MethodGet, fmt.Sprintf(string(userProfileURI), username))
 	if err != nil {
-		log.Fatal(err.Error())
-		os.Exit(0)
+		return user, err
 	}
-	g.applySharedHeaders(req)
-	res, err := g.client.Do(req)
-	if err != nil {
-		log.Fatal(err.Error())
-		os.Exit(0)
+	if err := g.do(request, &user); err != nil {
+		return user, err
 	}
-	var githubUsers GithubUser
-	g.extractResponseBodyContent(res, &githubUsers)
-	return githubUsers
+	return user, nil
 }
 
-func (g *githubClient) getGitHubFollowingPage(username string, page int, uri GithubUserURI) *[]GithubDetailedUser {
-	req, err := http.NewRequest("GET", fmt.Sprintf(string(uri), username), nil)
-	queries := req.URL.Query()
-	queries.Set("page", string(page))
-	queries.Set("per_page", "100")
-	if err != nil {
-		log.Fatal(err.Error())
-		os.Exit(0)
+func (g *githubClient) GetGitHubFollowers(username string) ([]GithubFollower, error) {
+	var followers []GithubFollower
+	for page := 1; ; page++ {
+		pageFollowers, err := g.getGitHubFollowersPage(username, page)
+		if err != nil {
+			return nil, err
+		}
+		followers = append(followers, pageFollowers...)
+		if len(pageFollowers) < followersPerPage {
+			return followers, nil
+		}
 	}
-	g.applySharedHeaders(req)
-	res, err := g.client.Do(req)
-	if err != nil {
-		log.Fatal(err.Error())
-		os.Exit(0)
-	}
-	var githubUsers []GithubDetailedUser
-	g.extractResponseBodyContent(res, &githubUsers)
-	return &githubUsers
 }
 
-func (g *githubClient) GetGitHubFollowing(username string, uri GithubUserURI) *GithubDetailedUsers {
-	ghDetailedUsers := GithubDetailedUsers{}
-	return &ghDetailedUsers
+func (g *githubClient) getGitHubFollowersPage(username string, page int) ([]GithubFollower, error) {
+	request, err := g.newRequest(http.MethodGet, fmt.Sprintf(string(userFollowersURI), username))
+	if err != nil {
+		return nil, err
+	}
+	query := request.URL.Query()
+	query.Set("page", strconv.Itoa(page))
+	query.Set("per_page", strconv.Itoa(followersPerPage))
+	request.URL.RawQuery = query.Encode()
+	var followers []GithubFollower
+	if err := g.do(request, &followers); err != nil {
+		return nil, err
+	}
+	return followers, nil
 }
