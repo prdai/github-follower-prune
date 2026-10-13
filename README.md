@@ -52,6 +52,10 @@ The default `gh auth login` scopes do not include `user`, so blocking returns `4
 
 Blocking removes the follow relationship; unblocking afterwards avoids leaving the account blocked. Profile lookups run with a small concurrency cap to stay clear of secondary rate limits.
 
+## automation
+
+`.github/workflows/weekly-prune.yml` runs `make run` every Sunday at 00:00 UTC, and can also be triggered manually from the Actions tab. It expects a repository secret named `GH_TOKEN` holding a token with block permission (see [permissions](#permissions)); the workflow writes it to `.env` before running. Scheduled runs only fire on the default branch.
+
 ## development
 
 ```
