@@ -1,0 +1,26 @@
+name: weekly prune
+
+on:
+  schedule:
+    - cron: "0 0 * * 0"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: weekly-prune
+  cancel-in-progress: false
+
+jobs:
+  prune:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: write .env
+        run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" > .env
+      - name: prune
+        run: make run
