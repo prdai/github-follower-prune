@@ -21,6 +21,8 @@ jobs:
         with:
           go-version-file: go.mod
       - name: write .env
-        run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" > .env
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: printf 'GH_TOKEN=%s\n' "$(printf '%s' "$GH_TOKEN" | tr -d '\r\n')" > .env
       - name: prune
         run: make run
